@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>陳健銘 · Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#02040E;--accent:#64FFDA;--text:#E8EBF5;--muted:#6B7FA8;
+  --border:rgba(100,255,218,0.13);--panel:rgba(3,7,20,0.88);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;cursor:none}
+#cur{position:fixed;width:6px;height:6px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--accent)}
+#cur2{position:fixed;width:22px;height:22px;border:1px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.35}
+
+/* ── Background canvas (stars/meteors) ── */
+#gc{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+/* ── Planet close-up canvas (left 30%) ── */
+#pc{position:fixed;left:0;top:0;width:30%;height:100%;z-index:3;pointer-events:none}
+
+/* ── TRANSITION CANVAS: full-screen, sits above everything during transit ── */
+#tc{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0;transition:opacity .18s}
+#tc.visible{opacity:1}
+
+/* ── Right content panel ── */
+#panel{position:fixed;left:30%;top:0;width:70%;height:100%;z-index:4;border-left:1px solid var(--border);background:var(--panel);backdrop-filter:blur(20px);overflow:hidden;transition:opacity .35s}
+#panel.hidden{opacity:0;pointer-events:none}
+#scroll-inner{position:absolute;top:0;left:0;width:100%;will-change:transform}
+.sec{width:100%;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:5rem 4rem 4rem 3rem;position:relative}
+
+/* content reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease}
+.rv.in{opacity:1;transform:none}
+.s1{transition-delay:.08s}.s2{transition-delay:.22s}.s3{transition-delay:.38s}.s4{transition-delay:.54s}
+
+.stag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:.9rem}
+.stitle{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,3.3vw,3rem);font-weight:200;line-height:1.2;margin-bottom:1.6rem}
+.snum{position:absolute;top:2rem;right:2.5rem;font-family:'Space Mono',monospace;font-size:11px;color:rgba(100,255,218,.16);letter-spacing:2px}
+p{font-size:.93rem;line-height:1.9;color:rgba(232,235,245,.72)}
+.hi{color:var(--accent)}
+.dv{width:40px;height:1px;background:var(--accent);opacity:.45;margin:1.4rem 0}
+
+.ei{border-left:2px solid var(--border);padding:.85rem 0 .85rem 1.4rem;margin-bottom:1.2rem;position:relative}
+.ei::before{content:'';position:absolute;left:-5px;top:1.05rem;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.eyr{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:.25rem}
+.esc{font-size:1rem;font-weight:500;margin-bottom:.18rem}
+.ede{font-size:.84rem;color:var(--muted)}
+
+.scat{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin:1.3rem 0 .55rem}
+.scat:first-child{margin-top:0}
+.sgr{display:flex;flex-wrap:wrap;gap:.45rem}
+.sk{padding:.32rem .85rem;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;transition:all .22s;background:rgba(100,255,218,.018)}
+.sk:hover{border-color:var(--accent);color:var(--accent);background:rgba(100,255,218,.06)}
+
+.wk{padding:1.2rem 1.35rem;border:1px solid var(--border);margin-bottom:.9rem;background:rgba(100,255,218,.012);transition:all .22s}
+.wk:hover{border-color:rgba(100,255,218,.32);transform:translateX(4px)}
+.whd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.28rem}
+.wtl{font-size:.98rem;font-weight:500}
+.wpr{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px}
+.wco{font-size:.83rem;color:var(--muted);margin-bottom:.55rem}
+.wde{font-size:.87rem;line-height:1.68;color:rgba(232,235,245,.58)}
+
+.cl{display:flex;flex-direction:column;gap:.7rem;margin-top:.9rem}
+.ci{display:flex;align-items:center;gap:1.15rem;padding:1rem 1.35rem;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:all .28s;background:rgba(100,255,218,.012)}
+.ci:hover{border-color:var(--accent);transform:translateX(6px);background:rgba(100,255,218,.05)}
+.cic{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--accent);flex-shrink:0}
+.clb{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);margin-bottom:2px}
+.clv{font-size:.88rem}
+
+#dots{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:.85rem;z-index:200;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--muted);cursor:pointer;transition:all .3s}
+.dot.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 7px var(--accent);width:20px;border-radius:3px}
+
+#ptag{position:fixed;left:0;bottom:3.2rem;width:30%;text-align:center;z-index:10;pointer-events:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;transition:opacity .35s}
+
+#shint{position:fixed;right:2rem;bottom:2.5rem;display:flex;flex-direction:column;align-items:center;gap:.38rem;opacity:.38;z-index:200;transition:opacity .4s}
+#shint span{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);writing-mode:vertical-rl}
+.sa{width:1px;height:34px;background:linear-gradient(to bottom,transparent,var(--muted));animation:sp 1.6s ease infinite}
+@keyframes sp{0%,100%{opacity:.2;transform:scaleY(.6)}50%{opacity:.7;transform:scaleY(1)}}
+
+.name-big{font-family:'Noto Serif TC',serif;font-size:clamp(2.8rem,4.8vw,4.6rem);font-weight:200;letter-spacing:.04em;line-height:1.05}
+.name-en{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--muted);letter-spacing:4px;margin-top:.38rem;margin-bottom:1.8rem}
+
+/* ── Contact page overrides ── */
+.sec-contact{padding:1.6rem 4rem 1.6rem 3rem;justify-content:flex-start;overflow:visible}
+
+/* Terminal input row */
+#msg-form{display:flex;gap:.6rem;margin-top:.9rem;align-items:stretch}
+#msg-input{flex:1;background:rgba(100,255,218,.04);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.82rem;padding:.65rem 1rem;outline:none;transition:border-color .22s;caret-color:var(--accent)}
+#msg-input:focus{border-color:rgba(100,255,218,.55)}
+#msg-input::placeholder{color:var(--muted);opacity:.5}
+#msg-send{padding:.65rem 1.3rem;background:transparent;border:1px solid var(--border);color:var(--accent);font-family:'Space Mono',monospace;font-size:.78rem;letter-spacing:2px;cursor:pointer;transition:all .22s;white-space:nowrap}
+#msg-send:hover{background:rgba(100,255,218,.08);border-color:var(--accent)}
+#msg-send:active{transform:scale(.97)}
+
+/* Terminal log */
+#msg-log{margin-top:.7rem;height:5.5rem;overflow-y:auto;display:flex;flex-direction:column;gap:.28rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.msg-line{font-family:'Space Mono',monospace;font-size:.75rem;line-height:1.5;display:flex;gap:.5rem}
+.msg-line .pf{color:var(--accent);opacity:.7;flex-shrink:0}
+.msg-line .ms{color:rgba(232,235,245,.55)}
+.msg-line.sys .ms{color:rgba(100,255,218,.5)}
+.msg-line.err .ms{color:rgba(255,100,100,.55)}
+
+/* Contact cards */
+.ci2{display:flex;align-items:center;gap:1rem;padding:.85rem 1.15rem;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:all .3s;background:rgba(100,255,218,.012);position:relative;overflow:hidden;cursor:pointer}
+.ci2::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(100,255,218,.06),transparent);transform:translateX(-100%);transition:transform .5s}
+.ci2:hover::after{transform:translateX(100%)}
+.ci2:hover{border-color:rgba(100,255,218,.5);background:rgba(100,255,218,.04)}
+.ci2:hover .ci2-icon{border-color:var(--accent);box-shadow:0 0 12px rgba(100,255,218,.3);transform:rotate(5deg) scale(1.08)}
+.ci2:hover .ci2-copy{opacity:1}
+.ci2-icon{width:38px;height:38px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--accent);flex-shrink:0;transition:all .3s}
+.ci2-body{flex:1;min-width:0}
+.ci2-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);margin-bottom:2px}
+.ci2-value{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci2-copy{opacity:0;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent);transition:opacity .2s;flex-shrink:0}
+.ci2.copied{border-color:var(--accent);background:rgba(100,255,218,.08)}
+.ci2.copied .ci2-copy{opacity:1;color:var(--accent)}
+
+/* status beacon */
+#status-row{display:flex;align-items:center;gap:.6rem;margin:.55rem 0 .8rem}
+.beacon{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:bpulse 2s ease infinite;flex-shrink:0}
+@keyframes bpulse{0%,100%{box-shadow:0 0 0 0 rgba(100,255,218,.5)}60%{box-shadow:0 0 0 6px rgba(100,255,218,0)}}
+#status-txt{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted)}
+
+/* typewriter cursor */
+.twcursor{display:inline-block;width:2px;height:.9em;background:var(--accent);margin-left:2px;animation:blink .75s step-end infinite;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Skill tag active state ── */
+.sk.active{border-color:var(--accent);color:var(--accent);background:rgba(100,255,218,.12);box-shadow:0 0 8px rgba(100,255,218,.18)}
+
+/* ── Work item expand ── */
+.wk{cursor:pointer}
+.wk .wde{max-height:0;overflow:hidden;opacity:0;transition:max-height .38s ease,opacity .3s ease,margin-top .3s ease;margin-top:0}
+.wk.open .wde{max-height:8rem;opacity:1;margin-top:.55rem}
+.wk .wex{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:.3rem;transition:color .2s}
+.wk:hover .wex,.wk.open .wex{color:var(--accent)}
+.wk.open{border-color:rgba(100,255,218,.28);background:rgba(100,255,218,.03)}
+.wex-arrow{display:inline-block;transition:transform .3s}
+.wk.open .wex-arrow{transform:rotate(90deg)}
+
+/* ── Contact copy toast ── */
+#copy-toast{position:fixed;bottom:3.5rem;left:50%;transform:translateX(-50%) translateY(6px);background:rgba(100,255,218,.12);border:1px solid var(--accent);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);padding:.45rem 1.2rem;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:300;backdrop-filter:blur(8px)}
+#copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Typewriter role line ── */
+#role-line{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--accent);letter-spacing:2px;min-height:1.2em;margin-bottom:.6rem}
+
+/* ── Transit HUD (shown on transition canvas) ── */
+#trans-hud{position:fixed;inset:0;z-index:51;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:3.5rem;opacity:0;transition:opacity .3s}
+#trans-hud.visible{opacity:1}
+#trans-dest{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:6px;color:var(--accent);text-transform:uppercase;margin-bottom:.5rem;opacity:.7}
+#trans-prog-bar{width:140px;height:1px;background:rgba(100,255,218,.15);position:relative;overflow:visible}
+#trans-prog-fill{position:absolute;left:0;top:0;height:1px;background:var(--accent);width:0%;transition:none;box-shadow:0 0 6px var(--accent)}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="cur2"></div>
+
+<!-- z1: star/meteor bg -->
+<canvas id="gc"></canvas>
+<!-- z3: planet closeup left panel -->
+<canvas id="pc"></canvas>
+<!-- z4: content panel -->
+<div id="panel">
+  <div id="scroll-inner">
+
+    <!-- 01 INTRO -->
+    <div class="sec" data-sec="0">
+      <span class="snum">01 / 05</span>
+      <div class="stag rv s1">Hello, World</div>
+      <h1 class="name-big rv s2">陳健銘</h1>
+      <div class="rv s2"><p class="name-en">CHIEN-MING CHEN</p></div>
+      <div class="rv s3">
+        <div id="role-line"><span id="role-text"></span><span class="twcursor"></span></div>
+        <p>數學建模研究者 · AI 工程師，深耕科學計算與隨機過程理論，善於將物理、生物與金融問題轉化為可計算的數學架構。</p>
+        <div class="dv"></div>
+        <p>現居 <span class="hi">台灣・新竹</span>，就讀國立陽明交通大學數學建模與科學計算研究所，目標融合數理與 AI 技術解決高影響力的複雜問題。</p>
+      </div>
+    </div>
+
+    <!-- 02 EDUCATION -->
+    <div class="sec" data-sec="1">
+      <span class="snum">02 / 05</span>
+      <div class="stag rv s1">Academic Journey</div>
+      <h2 class="stitle rv s2">學歷</h2>
+      <div class="rv s3">
+        <div class="ei"><div class="eyr">2021 — 2025</div><div class="esc">國立臺東大學</div><div class="ede">應用數學系 · 學士</div></div>
+        <div class="ei"><div class="eyr">2025 — 2027（就讀中）</div><div class="esc">國立陽明交通大學</div><div class="ede">數學建模與科學計算研究所 · 碩士</div></div>
+      </div>
+    </div>
+
+    <!-- 03 SKILLS -->
+    <div class="sec" data-sec="2">
+      <span class="snum">03 / 05</span>
+      <div class="stag rv s1">Skills & Expertise</div>
+      <h2 class="stitle rv s2">專長</h2>
+      <div class="rv s3">
+        <div class="scat">程式語言 & 工具</div>
+        <div class="sgr"><div class="sk">Python</div><div class="sk">NumPy</div><div class="sk">Matplotlib</div><div class="sk">Linux</div><div class="sk">LabelImg</div><div class="sk">YOLO</div></div>
+        <div class="scat">數值分析 & 科學計算</div>
+        <div class="sgr"><div class="sk">Numerical PDEs</div><div class="sk">Spectral Methods</div><div class="sk">FFT Solvers</div><div class="sk">FDM</div><div class="sk">RK4</div><div class="sk">MMS</div></div>
+        <div class="scat">數學建模 & 分析</div>
+        <div class="sgr"><div class="sk">Stochastic Processes</div><div class="sk">Linear Algebra</div><div class="sk">Algorithmic Analysis</div><div class="sk">數據分析</div></div>
+      </div>
+    </div>
+
+    <!-- 04 EXPERIENCE -->
+    <div class="sec" data-sec="3">
+      <span class="snum">04 / 05</span>
+      <div class="stag rv s1">Work Experience</div>
+      <h2 class="stitle rv s2">工作經歷</h2>
+      <div class="rv s3">
+        <div class="wk"><div class="whd"><div class="wtl">AI Intern</div><div class="wpr">2025/09 — 2026/06</div></div><div class="wco">美商普維股份有限公司（LatticeWork）· 新竹竹北</div><div class="wde">負責 CV 模型訓練之自動化影像前處理，撰寫 Python 腳本進行影格抽樣與圖像清洗；以 LabelImg 進行 Bounding Box 標註與 QA，建構符合 YOLO 格式的高品質訓練資料集。</div><div class="wex"><span class="wex-arrow">▶</span> DETAILS</div></div>
+        <div class="wk"><div class="whd"><div class="wtl">數學老師（線上家教）</div><div class="wpr">2024/09 — 2025/02</div></div><div class="wco">高教深耕計畫 · 教育部 · 台北大安區</div><div class="wde">線上一對一教授國中數學，將複雜數理概念轉化為易懂的想法，培養學生邏輯思維與解題能力。</div><div class="wex"><span class="wex-arrow">▶</span> DETAILS</div></div>
+        <div class="wk"><div class="whd"><div class="wtl">微積分助教</div><div class="wpr">2023/09 — 2024/06</div></div><div class="wco">國立臺東大學 · 台東</div><div class="wde">擔任學士班微積分助教，負責習題講解與課後輔導，協助學生掌握微積分核心概念。</div><div class="wex"><span class="wex-arrow">▶</span> DETAILS</div></div>
+        <div class="wk"><div class="whd"><div class="wtl">櫃檯接待人員</div><div class="wpr">2022/07 — 2022/09</div></div><div class="wco">第一銀行台東分行 · 台東</div><div class="wde">負責銀行櫃檯內勤業務與客戶接待引導，保持高專注度，跨部門協作快速應變，優化客戶服務體驗。</div><div class="wex"><span class="wex-arrow">▶</span> DETAILS</div></div>
+      </div>
+    </div>
+
+    <!-- 05 CONTACT -->
+    <div class="sec sec-contact" data-sec="4">
+      <span class="snum">05 / 05</span>
+      <div class="stag rv s1">Get In Touch</div>
+      <h2 class="stitle rv s2">Contact Me</h2>
+      <div class="rv s3">
+        <p>距離再遠，連結始終存在。歡迎透過以下方式聯繫。</p>
+        <div class="cl">
+          <a class="ci" href="mailto:jcm0621011@gmail.com"><div class="cic">✉</div><div><div class="clb">Email</div><div class="clv">jcm0621011@gmail.com</div></div></a>
+          <a class="ci" href="tel:0968890783"><div class="cic">☎</div><div><div class="clb">Phone</div><div class="clv">0968-890-783</div></div></a>
+          <a class="ci" href="#"><div class="cic" style="font-size:11px;font-weight:600">📍</div><div><div class="clb">Location</div><div class="clv">新竹縣市（希望工作地點）</div></div></a>
+          <a class="ci" href="#"><div class="cic" style="font-size:10px;font-weight:700">役</div><div><div class="clb">役別 / 求職意願</div><div class="clv">未役 · 尋找研發替代役 / 實習</div></div></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- z50: full-screen transition canvas -->
+<canvas id="tc"></canvas>
+<!-- HUD shown during transit -->
+<div id="trans-hud">
+  <div id="trans-dest">— NAVIGATING —</div>
+  <div id="trans-prog-bar"><div id="trans-prog-fill"></div></div>
+</div>
+
+<div id="copy-toast">COPIED TO CLIPBOARD</div>
+<div id="ptag">太陽 · Sun</div>
+<div id="dots">
+  <div class="dot on" data-i="0"></div>
+  <div class="dot" data-i="1"></div>
+  <div class="dot" data-i="2"></div>
+  <div class="dot" data-i="3"></div>
+  <div class="dot" data-i="4"></div>
+</div>
+<div id="shint"><div class="sa"></div><span>SCROLL</span></div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════════════════
+const curEl=document.getElementById('cur'),cur2El=document.getElementById('cur2');
+let mx=innerWidth/2,my=innerHeight/2,tx2=mx,ty2=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;curEl.style.left=mx+'px';curEl.style.top=my+'px'});
+(function ac(){tx2+=(mx-tx2)*.13;ty2+=(my-ty2)*.13;cur2El.style.left=tx2+'px';cur2El.style.top=ty2+'px';requestAnimationFrame(ac)})();
+
+// ═══════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════
+const gc=document.getElementById('gc'), gctx=gc.getContext('2d');
+const pc=document.getElementById('pc'), pctx=pc.getContext('2d');
+const tc=document.getElementById('tc'), tctx=tc.getContext('2d');
+
+function resize(){
+  gc.width=innerWidth; gc.height=innerHeight;
+  tc.width=innerWidth; tc.height=innerHeight;
+  pc.width=Math.round(innerWidth*.3); pc.height=innerHeight;
+}
+resize(); window.addEventListener('resize',resize);
+
+// ═══════════════════════════════════════════════════════
+// MATH HELPERS
+// ═══════════════════════════════════════════════════════
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const easeInOut3=(t)=>t<.5?4*t*t*t:(1-(-2*t+2)**3/2);
+const easeOut4=(t)=>1-(1-t)**4;
+const easeIn2=(t)=>t*t;
+const easeOut2=(t)=>1-(1-t)*(1-t);
+
+// ═══════════════════════════════════════════════════════
+// STARS (background canvas)
+// ═══════════════════════════════════════════════════════
+let stars=[];
+function initStars(){
+  stars=Array.from({length:420},()=>({
+    x:Math.random()*gc.width, y:Math.random()*gc.height,
+    r:Math.random()*1.5+.1, a:Math.random()*.8+.1,
+    sp:Math.random()*.006+.001, ph:Math.random()*Math.PI*2,
+  }));
+}
+initStars(); window.addEventListener('resize',initStars);
+
+// ═══════════════════════════════════════════════════════
+// METEORS (background canvas, ambient only)
+// ═══════════════════════════════════════════════════════
+const meteors=[];
+function spawnMeteor(){
+  const from01=Math.random()<.5;
+  let sx,sy,ang;
+  if(from01){sx=Math.random()*gc.width;sy=-10;ang=Math.PI/4+Math.random()*.4-.2;}
+  else{sx=-10;sy=Math.random()*gc.height*.7;ang=.25+Math.random()*.35;}
+  meteors.push({x:sx,y:sy,vx:Math.cos(ang)*(16+Math.random()*8),vy:Math.sin(ang)*(16+Math.random()*8),
+    len:80+Math.random()*130,w:.8+Math.random()*1.2,life:1+Math.random()*.5,
+    col:Math.random()<.25?'rgba(200,220,255,':'rgba(255,255,255,'});
+}
+setInterval(()=>{if(Math.random()<.65)spawnMeteor();},1100);
+
+function drawMeteors(){
+  for(let i=meteors.length-1;i>=0;i--){
+    const m=meteors[i];
+    m.x+=m.vx; m.y+=m.vy; m.life-=.018;
+    if(m.life<=0||m.x>gc.width+200||m.y>gc.height+200){meteors.splice(i,1);continue;}
+    const tx=m.x-m.vx*(m.len/18),ty=m.y-m.vy*(m.len/18);
+    const g=gctx.createLinearGradient(m.x,m.y,tx,ty);
+    g.addColorStop(0,m.col+Math.min(m.life,.9)+')');
+    g.addColorStop(.4,m.col+(m.life*.4)+')');
+    g.addColorStop(1,m.col+'0)');
+    gctx.beginPath();gctx.moveTo(m.x,m.y);gctx.lineTo(tx,ty);
+    gctx.strokeStyle=g;gctx.lineWidth=m.w;gctx.stroke();
+    gctx.beginPath();gctx.arc(m.x,m.y,m.w*1.2,0,Math.PI*2);
+    gctx.fillStyle=m.col+Math.min(m.life,.9)+')';gctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// NOISE helpers (for planet textures)
+// ═══════════════════════════════════════════════════════
+function hash(x,y,s){return Math.abs(Math.sin(x*127.1+y*311.7+s*74.3)*43758.5453)%1;}
+function n2(x,y,s){
+  const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy;
+  const u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);
+  return lerp(lerp(hash(ix,iy,s),hash(ix+1,iy,s),u),lerp(hash(ix,iy+1,s),hash(ix+1,iy+1,s),u),v);
+}
+function fbm(x,y,o,s){let v=0,a=.5,f=1;for(let i=0;i<o;i++){v+=a*n2(x*f,y*f,s+i*17);a*=.5;f*=2.1;}return v;}
+
+// ═══════════════════════════════════════════════════════
+// PLANET DRAWERS
+// ═══════════════════════════════════════════════════════
+function drawSun(ctx,cx,cy,r,t,al){
+  ctx.save();ctx.globalAlpha=al;
+  // outer corona rings
+  for(let i=4;i>=1;i--){
+    const rg=ctx.createRadialGradient(cx,cy,r*.5,cx,cy,r*(1+i*.35));
+    rg.addColorStop(0,`rgba(255,140,20,${.18/i})`);rg.addColorStop(1,'rgba(255,60,0,0)');
+    ctx.beginPath();ctx.arc(cx,cy,r*(1+i*.35),0,Math.PI*2);ctx.fillStyle=rg;ctx.fill();
+  }
+  // flares
+  for(let i=0;i<20;i++){
+    const a=(i/20)*Math.PI*2+t*.15;const ln=r*(.14+.18*Math.sin(t*1.1+i*.71));
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(a);
+    const lg=ctx.createLinearGradient(r,0,r+ln,0);
+    lg.addColorStop(0,`rgba(255,200,60,${.5+.28*Math.sin(t+i)})`);lg.addColorStop(1,'rgba(255,80,0,0)');
+    ctx.beginPath();ctx.moveTo(r+2,0);ctx.lineTo(r+ln,0);ctx.strokeStyle=lg;ctx.lineWidth=1.5+Math.sin(t*.9+i)*.5;ctx.stroke();ctx.restore();
+  }
+  // surface gradient
+  const bg=ctx.createRadialGradient(cx-r*.22,cy-r*.2,r*.04,cx,cy,r);
+  bg.addColorStop(0,'#FFF9C4');bg.addColorStop(.2,'#FFE066');bg.addColorStop(.5,'#FFA500');bg.addColorStop(.82,'#FF5500');bg.addColorStop(1,'#C84000');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  // surface texture via fbm
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  const id=ctx.getImageData(cx-r,cy-r,r*2,r*2);const d=id.data;const sz=r*2;
+  for(let px=0;px<sz;px+=2){for(let py=0;py<sz;py+=2){
+    const nx2=(px/sz-.5)*3,ny2=(py/sz-.5)*3;
+    if(nx2*nx2+ny2*ny2>1.02)continue;
+    const nv=fbm(nx2+t*.03,ny2+t*.025,4,0);
+    if(nv>.39){const ii=(py*sz+px)*4;d[ii]=255;d[ii+1]=255;d[ii+2]=Math.round(100*nv);d[ii+3]=Math.round(120*nv);}
+  }}ctx.putImageData(id,cx-r,cy-r);ctx.restore();
+  // sunspots
+  for(let i=0;i<5;i++){
+    const sa=t*.07+i*1.26,sr=.5+.13*Math.sin(i*2.3);
+    const sx2=cx+Math.cos(sa)*r*sr,sy2=cy+Math.sin(sa*.65)*r*.38;
+    const sg=ctx.createRadialGradient(sx2,sy2,0,sx2,sy2,r*.085);
+    sg.addColorStop(0,'rgba(55,12,0,.88)');sg.addColorStop(.5,'rgba(120,35,0,.5)');sg.addColorStop(1,'rgba(180,65,0,0)');
+    ctx.beginPath();ctx.arc(sx2,sy2,r*.085,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawEarth(ctx,cx,cy,r,t,al){
+  ctx.save();ctx.globalAlpha=al;
+  const ag=ctx.createRadialGradient(cx,cy,r,cx,cy,r*1.22);
+  ag.addColorStop(0,'rgba(85,165,255,.35)');ag.addColorStop(.55,'rgba(45,115,220,.09)');ag.addColorStop(1,'rgba(20,65,175,0)');
+  ctx.beginPath();ctx.arc(cx,cy,r*1.22,0,Math.PI*2);ctx.fillStyle=ag;ctx.fill();
+  const og=ctx.createRadialGradient(cx-r*.22,cy-r*.2,r*.07,cx,cy,r);
+  og.addColorStop(0,'#8EDFFF');og.addColorStop(.3,'#3A9BD5');og.addColorStop(.68,'#1A5FA0');og.addColorStop(1,'#0A2E5C');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=og;ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  const sp=t*.1;
+  [{a:0,d:.55,rx:38,ry:28},{a:1.4,d:.5,rx:32,ry:21},{a:2.8,d:.46,rx:28,ry:17},
+   {a:4.2,d:.51,rx:35,ry:23},{a:5.6,d:.44,rx:18,ry:12},{a:3.4,d:.36,rx:16,ry:11}].forEach(l=>{
+    const la=l.a+sp,lx=cx+Math.cos(la)*r*l.d,ly=cy+Math.sin(la)*r*l.d*.55;
+    ctx.save();ctx.translate(lx,ly);ctx.rotate(la*.5);
+    ctx.beginPath();ctx.ellipse(0,0,l.rx*(r/100),l.ry*(r/100),0,0,Math.PI*2);ctx.fillStyle='#2E7D32';ctx.fill();
+    ctx.beginPath();ctx.ellipse(-l.rx*(r/100)*.2,-l.ry*(r/100)*.2,l.rx*(r/100)*.5,l.ry*(r/100)*.5,0,0,Math.PI*2);ctx.fillStyle='rgba(80,160,65,.25)';ctx.fill();ctx.restore();
+  });
+  ctx.beginPath();ctx.ellipse(cx,cy-r+r*.13,r*.28,r*.12,0,0,Math.PI*2);ctx.fillStyle='rgba(238,248,255,.9)';ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx,cy+r-r*.1,r*.2,r*.08,0,0,Math.PI*2);ctx.fillStyle='rgba(238,248,255,.75)';ctx.fill();
+  for(let i=0;i<9;i++){
+    const ca=i*1.08+t*.045,cd=.28+i*.075,ccx=cx+Math.cos(ca)*r*cd,ccy=cy+Math.sin(ca*.58)*r*.32;
+    const cg2=ctx.createRadialGradient(ccx,ccy,0,ccx,ccy,r*.18);
+    cg2.addColorStop(0,'rgba(255,255,255,.45)');cg2.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(ccx,ccy,r*.18,0,Math.PI*2);ctx.fillStyle=cg2;ctx.fill();
+  }ctx.restore();
+  const sp2=ctx.createRadialGradient(cx-r*.35,cy-r*.35,0,cx-r*.28,cy-r*.28,r*.5);
+  sp2.addColorStop(0,'rgba(255,255,255,.18)');sp2.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=sp2;ctx.fill();
+  ctx.restore();
+}
+
+function drawMars(ctx,cx,cy,r,t,al){
+  ctx.save();ctx.globalAlpha=al;
+  const hz=ctx.createRadialGradient(cx,cy,r*.88,cx,cy,r*1.18);
+  hz.addColorStop(0,'rgba(200,70,15,.15)');hz.addColorStop(1,'rgba(200,70,15,0)');
+  ctx.beginPath();ctx.arc(cx,cy,r*1.18,0,Math.PI*2);ctx.fillStyle=hz;ctx.fill();
+  const bg=ctx.createRadialGradient(cx-r*.25,cy-r*.22,r*.05,cx,cy,r);
+  bg.addColorStop(0,'#E8834A');bg.addColorStop(.38,'#C1440E');bg.addColorStop(.75,'#8C2E00');bg.addColorStop(1,'#4A1200');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  const sp=t*.12;
+  for(let px=0;px<r*2;px+=3){for(let py=0;py<r*2;py+=3){
+    const dx=(px-r)/r,dy=(py-r)/r;if(dx*dx+dy*dy>1)continue;
+    const nv=fbm(dx*2.2+sp*.28,dy*2.2+sp*.18,3,42);
+    if(nv>.53){ctx.fillStyle=`rgba(255,148,68,${(nv-.53)*1.2})`;ctx.fillRect(cx-r+px,cy-r+py,3,3);}
+  }}
+  [[.2,.15,.1],[-.3,-.2,.07],[.1,-.35,.085],[-.15,.3,.065],[.35,.1,.055]].forEach(([ox,oy,cr])=>{
+    const bx=cx+Math.cos(sp+ox*5)*r*Math.abs(ox),by=cy+Math.sin(sp*.7+oy*5)*r*Math.abs(oy)*.6;
+    const sg=ctx.createRadialGradient(bx,by,0,bx,by,r*cr);
+    sg.addColorStop(0,'rgba(72,10,0,.58)');sg.addColorStop(.5,'rgba(128,38,0,.5)');sg.addColorStop(1,'rgba(186,68,0,0)');
+    ctx.beginPath();ctx.arc(bx,by,r*cr,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+  });
+  ctx.beginPath();ctx.ellipse(cx,cy-r+r*.12,r*.2,r*.1,0,0,Math.PI*2);ctx.fillStyle='rgba(255,248,235,.6)';ctx.fill();
+  ctx.restore();ctx.restore();
+}
+
+function drawSaturn(ctx,cx,cy,r,t,al){
+  ctx.save();ctx.globalAlpha=al;
+  const rings=[
+    {ri:r*1.15,ro:r*1.33,c:'rgba(192,150,60,.52)'},{ri:r*1.34,ro:r*1.57,c:'rgba(215,178,94,.42)'},
+    {ri:r*1.58,ro:r*1.8,c:'rgba(178,138,58,.32)'},{ri:r*1.82,ro:r*1.96,c:'rgba(205,168,85,.18)'},
+    {ri:r*2.0,ro:r*2.14,c:'rgba(225,195,115,.11)'}
+  ];
+  ctx.save();ctx.translate(cx,cy);ctx.scale(1,.28);
+  rings.forEach(rd=>{ctx.beginPath();ctx.arc(0,0,rd.ro,Math.PI,Math.PI*2);ctx.arc(0,0,rd.ri,Math.PI*2,Math.PI,true);ctx.closePath();ctx.fillStyle=rd.c;ctx.fill();});
+  ctx.restore();
+  const bg=ctx.createRadialGradient(cx-r*.22,cy-r*.2,r*.07,cx,cy,r);
+  bg.addColorStop(0,'#F9E89E');bg.addColorStop(.28,'#E8BE5C');bg.addColorStop(.64,'#C07E1E');bg.addColorStop(1,'#6A3A00');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  [-3.5,-2.3,-1.2,0,1.2,2.3,3.5].forEach((by2,i)=>{
+    ctx.save();ctx.translate(cx,cy);ctx.scale(1,.28);
+    ctx.beginPath();ctx.ellipse(0,by2*r*.19,r*.94,r*.13,0,0,Math.PI*2);
+    ctx.fillStyle=i%2===0?'rgba(170,112,35,.24)':'rgba(235,195,84,.18)';ctx.fill();ctx.restore();
+  });
+  ctx.restore();
+  ctx.save();ctx.translate(cx,cy);ctx.scale(1,.28);
+  rings.forEach(rd=>{ctx.beginPath();ctx.arc(0,0,rd.ro,0,Math.PI);ctx.arc(0,0,rd.ri,Math.PI,0,true);ctx.closePath();ctx.fillStyle=rd.c;ctx.fill();});
+  ctx.restore();
+  const sph=ctx.createRadialGradient(cx-r*.3,cy-r*.3,0,cx-r*.24,cy-r*.24,r*.5);
+  sph.addColorStop(0,'rgba(255,255,255,.16)');sph.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=sph;ctx.fill();
+  ctx.restore();
+}
+
+function drawNeptune(ctx,cx,cy,r,t,al){
+  ctx.save();ctx.globalAlpha=al;
+  for(let i=3;i>=1;i--){
+    const g=ctx.createRadialGradient(cx,cy,r*.65,cx,cy,r*(1+i*.26));
+    g.addColorStop(0,`rgba(25,52,170,${.12/i})`);g.addColorStop(1,'rgba(8,22,90,0)');
+    ctx.beginPath();ctx.arc(cx,cy,r*(1+i*.26),0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  }
+  const bg=ctx.createRadialGradient(cx-r*.2,cy-r*.2,r*.06,cx,cy,r);
+  bg.addColorStop(0,'#9DC5F6');bg.addColorStop(.28,'#5585CE');bg.addColorStop(.64,'#2545A5');bg.addColorStop(1,'#0C1C58');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  const sp=t*.18;
+  for(let i=-5;i<=5;i++){
+    ctx.save();ctx.translate(cx,cy);ctx.scale(1,.26);
+    ctx.beginPath();ctx.ellipse(0,i*r*.19+Math.sin(t*.035+i)*.4*r,r*.95,r*.09,0,0,Math.PI*2);
+    ctx.fillStyle=i%2===0?'rgba(70,130,245,.13)':'rgba(35,72,190,.08)';ctx.fill();ctx.restore();
+  }
+  const gsx=cx+Math.cos(sp*.5)*r*.38,gsy=cy+Math.sin(sp*.38)*r*.17;
+  const gsg=ctx.createRadialGradient(gsx,gsy,0,gsx,gsy,r*.18);
+  gsg.addColorStop(0,'rgba(6,16,72,.85)');gsg.addColorStop(.5,'rgba(16,35,110,.5)');gsg.addColorStop(1,'rgba(16,35,110,0)');
+  ctx.beginPath();ctx.arc(gsx,gsy,r*.18,0,Math.PI*2);ctx.fillStyle=gsg;ctx.fill();
+  for(let i=0;i<5;i++){
+    const wa=sp*.28+i*1.26,wr=.22+i*.11,wx=cx+Math.cos(wa)*r*wr,wy=cy+Math.sin(wa*.65)*r*.22;
+    const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,r*.12);
+    wg.addColorStop(0,'rgba(170,205,255,.26)');wg.addColorStop(1,'rgba(170,205,255,0)');
+    ctx.beginPath();ctx.arc(wx,wy,r*.12,0,Math.PI*2);ctx.fillStyle=wg;ctx.fill();
+  }ctx.restore();
+  ctx.save();ctx.translate(cx,cy);ctx.scale(1,.28);
+  ctx.beginPath();ctx.arc(0,0,r*1.36,0,Math.PI*2);ctx.arc(0,0,r*1.26,0,Math.PI*2,true);
+  ctx.fillStyle='rgba(50,90,190,.16)';ctx.fill();ctx.restore();
+  ctx.restore();
+}
+
+const DRAWERS=[drawSun,drawEarth,drawMars,drawSaturn,drawNeptune];
+
+// ═══════════════════════════════════════════════════════
+// SOLAR SYSTEM LAYOUT
+// ═══════════════════════════════════════════════════════
+const SYSTEM=[
+  {name:'太陽 · Sun',    label:'SUN',      orb:0,   color:'#FFA030', r:42, drawIdx:0},
+  {name:'地球 · Earth',  label:'EARTH',    orb:130, color:'#4B9CD3', r:16, drawIdx:1},
+  {name:'火星 · Mars',   label:'MARS',     orb:200, color:'#C1440E', r:12, drawIdx:2},
+  {name:'土星 · Saturn', label:'SATURN',   orb:305, color:'#E8C060', r:22, drawIdx:3},
+  {name:'海王星 · Neptune',label:'NEPTUNE',orb:430, color:'#5B8DB8', r:18, drawIdx:4},
+];
+
+// returns planet center in "system space" (pixels from system center, unscaled)
+function getPlanetPos(idx,t){
+  const b=SYSTEM[idx];
+  if(b.orb===0) return {x:0,y:0};
+  const speed=.032*(1/Math.sqrt(b.orb));
+  const angle=t*speed+idx*1.1;
+  return {x:b.orb*Math.cos(angle), y:b.orb*Math.sin(angle)*.35};
+}
+
+// ═══════════════════════════════════════════════════════
+// SCROLL / NAV STATE
+// ═══════════════════════════════════════════════════════
+const panel=document.getElementById('panel');
+const inner=document.getElementById('scroll-inner');
+const secs=document.querySelectorAll('.sec');
+const dots=document.querySelectorAll('.dot');
+const ptag=document.getElementById('ptag');
+const shint=document.getElementById('shint');
+const transHud=document.getElementById('trans-hud');
+const transDestEl=document.getElementById('trans-dest');
+const transProgFill=document.getElementById('trans-prog-fill');
+
+let scrollY=0, targetScrollY=0, wheelQ=0;
+let curSec=0;
+let blockInput=false;
+const VH=()=>innerHeight;
+const maxSY=()=>(secs.length-1)*VH();
+
+// smooth snap timer
+let snapTimer=null;
+function schedSnap(){
+  clearTimeout(snapTimer);
+  snapTimer=setTimeout(()=>{
+    const near=Math.round(targetScrollY/VH());
+    targetScrollY=clamp(near,0,secs.length-1)*VH();
+  },380);
+}
+
+window.addEventListener('wheel',e=>{e.preventDefault();if(!blockInput){wheelQ+=e.deltaY*.6;}},{passive:false});
+let tsY=0;
+window.addEventListener('touchstart',e=>{tsY=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchmove',e=>{if(!blockInput){const dy=tsY-e.touches[0].clientY;tsY=e.touches[0].clientY;wheelQ+=dy*1.1;}},{passive:true});
+window.addEventListener('keydown',e=>{
+  if(blockInput)return;
+  if(e.key==='ArrowDown'||e.key==='PageDown')wheelQ+=VH()*.7;
+  if(e.key==='ArrowUp'||e.key==='PageUp')wheelQ-=VH()*.7;
+});
+dots.forEach(d=>d.addEventListener('click',()=>{
+  if(blockInput)return;
+  const to=+d.dataset.i;
+  if(to!==curSec) beginTransition(curSec,to);
+}));
+
+function checkReveals(y){
+  secs.forEach((s,i)=>{
+    const inView=y>i*VH()-VH()*.6&&y<i*VH()+VH()*.6;
+    s.querySelectorAll('.rv').forEach(el=>{
+      if(inView)el.classList.add('in'); else el.classList.remove('in');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TRANSITION ENGINE
+//  Full-screen three-act cinematic on the #tc canvas.
+//  The content panel is hidden throughout; only the space scene is visible.
+//
+//  Act 1 · PULL-OUT  (cam zooms out from planet → solar system overview, ~1.1s)
+//  Act 2 · CRUISE    (camera glides across the system to destination, ~1.3s)
+//  Act 3 · DIVE-IN   (cam rushes toward destination planet, then snap-reveals, ~0.9s)
+// ═══════════════════════════════════════════════════════════════════════════
+let TR = {
+  active: false,
+  phase: 'idle',   // 'pullout' | 'cruise' | 'divein' | 'idle'
+  prog:  0,        // 0→1 within current phase
+  from:  0,
+  to:    0,
+
+  // camera: world-space system coords → screen
+  // camCX/camCY = system-world point mapped to screen center
+  // camScale = pixels-per-unit
+  camCX: 0,
+  camCY: 0,
+  camScale: 1,
+
+  // at start of each phase we interpolate from/to these camera states
+  csFrom: null,
+  csTo:   null,
+
+  // accumulated travel progress for the HUD bar (0→1)
+  hudProg: 0,
+};
+
+// Phase durations in seconds
+const PHASE_DUR = {pullout:1.1, cruise:1.4, divein:0.95};
+
+// A "camera state" = {cx, cy, scale} in system-world coords
+function makeCamState(worldX, worldY, scale){return {cx:worldX,cy:worldY,scale};}
+
+// Scale to see the full system
+function systemOverviewScale(){
+  const maxOrb=SYSTEM[SYSTEM.length-1].orb;
+  return Math.min(tc.width,tc.height)/(maxOrb*2.8);
+}
+
+// Scale for a close-up on a planet of radius r
+function planetCloseupScale(r){
+  return Math.min(tc.width,tc.height)*.36 / r;
+}
+
+function beginTransition(from, to){
+  if(TR.active) return;
+  TR.active=true; TR.from=from; TR.to=to;
+  TR.hudProg=0;
+  blockInput=true;
+
+  // Hide content, show transition canvas
+  panel.classList.add('hidden');
+  shint.style.opacity='0';
+  tc.classList.add('visible');
+  setTimeout(()=>{transHud.classList.add('visible');},200);
+  transDestEl.textContent='— NAVIGATING TO '+SYSTEM[to].label+' —';
+  transProgFill.style.width='0%';
+
+  // Initial camera = closeup on FROM planet
+  const fromPos=getPlanetPos(from, globalT);
+  const closeScale=planetCloseupScale(SYSTEM[from].r);
+  TR.camCX=fromPos.x; TR.camCY=fromPos.y; TR.camScale=closeScale;
+
+  TR.phase='pullout'; TR.prog=0;
+  const sysScale=systemOverviewScale();
+  // Pull out: go from closeup → system view centered on from-planet
+  TR.csFrom=makeCamState(fromPos.x, fromPos.y, closeScale);
+  TR.csTo  =makeCamState(fromPos.x, fromPos.y, sysScale);
+}
+
+function advanceTransition(dt, t){
+  if(!TR.active) return;
+  TR.prog += dt/PHASE_DUR[TR.phase];
+  const p=clamp(TR.prog,0,1);
+
+  if(TR.phase==='pullout'){
+    const ep=easeOut2(p);
+    TR.camScale=lerp(TR.csFrom.scale, TR.csTo.scale, ep);
+    TR.camCX=lerp(TR.csFrom.cx, TR.csTo.cx, ep);
+    TR.camCY=lerp(TR.csFrom.cy, TR.csTo.cy, ep);
+    TR.hudProg=p*.3;
+    if(TR.prog>=1){
+      TR.phase='cruise'; TR.prog=0;
+      const fromPos=getPlanetPos(TR.from,t);
+      const toPos=getPlanetPos(TR.to,t);
+      const sysScale=systemOverviewScale();
+      TR.csFrom=makeCamState(fromPos.x, fromPos.y, sysScale);
+      TR.csTo  =makeCamState(toPos.x, toPos.y, sysScale);
+    }
+  } else if(TR.phase==='cruise'){
+    const ep=easeInOut3(p);
+    TR.camCX=lerp(TR.csFrom.cx, TR.csTo.cx, ep);
+    TR.camCY=lerp(TR.csFrom.cy, TR.csTo.cy, ep);
+    TR.camScale=lerp(TR.csFrom.scale, TR.csTo.scale, ep);
+    TR.hudProg=.3+p*.5;
+    if(TR.prog>=1){
+      TR.phase='divein'; TR.prog=0;
+      const toPos=getPlanetPos(TR.to,t);
+      const sysScale=systemOverviewScale();
+      const closeScale=planetCloseupScale(SYSTEM[TR.to].r);
+      TR.csFrom=makeCamState(toPos.x, toPos.y, sysScale);
+      TR.csTo  =makeCamState(toPos.x, toPos.y, closeScale);
+    }
+  } else if(TR.phase==='divein'){
+    const ep=easeIn2(p);
+    TR.camScale=lerp(TR.csFrom.scale, TR.csTo.scale, ep);
+    TR.camCX=lerp(TR.csFrom.cx, TR.csTo.cx, ep);
+    TR.camCY=lerp(TR.csFrom.cy, TR.csTo.cy, ep);
+    TR.hudProg=.8+p*.2;
+    if(TR.prog>=1) finishTransition();
+  }
+
+  // Update HUD progress bar
+  transProgFill.style.width=(TR.hudProg*100).toFixed(1)+'%';
+}
+
+function finishTransition(){
+  TR.active=false; TR.phase='idle';
+  curSec=TR.to;
+  blockInput=false;
+  targetScrollY=curSec*VH();
+  scrollY=targetScrollY;
+  inner.style.transform=`translateY(${-scrollY}px)`;
+  checkReveals(scrollY);
+
+  // Update dots & ptag
+  dots.forEach((d,i)=>d.classList.toggle('on',i===curSec));
+  ptag.textContent=SYSTEM[curSec].name;
+  shint.style.opacity=curSec===secs.length-1?'0':'.38';
+
+  // Hide transition canvas, reveal content
+  transHud.classList.remove('visible');
+  tc.classList.remove('visible');
+  setTimeout(()=>{ panel.classList.remove('hidden'); },100);
+}
+
+// ═══════════════════════════════════════════════════════
+// FULL-SCREEN SOLAR SYSTEM SCENE (drawn on #tc)
+// ═══════════════════════════════════════════════════════
+function drawSystemScene(t){
+  const W=tc.width, H=tc.height;
+  tctx.clearRect(0,0,W,H);
+
+  // star background on tc too
+  stars.forEach(s=>{
+    const a=s.a*(.4+.6*Math.sin(t*s.sp+s.ph));
+    tctx.beginPath(); tctx.arc(s.x,s.y,s.r*.9,0,Math.PI*2);
+    tctx.fillStyle=`rgba(255,255,255,${a})`; tctx.fill();
+  });
+
+  // Convert system-world → screen
+  // screen = center + (world - cam) * scale
+  const SCX=W*.5, SCY=H*.5;
+  function wx(wx2){return SCX+(wx2-TR.camCX)*TR.camScale;}
+  function wy(wy2){return SCY+(wy2-TR.camCY)*TR.camScale;}
+
+  // orbit ellipses
+  SYSTEM.forEach(b=>{
+    if(b.orb===0)return;
+    tctx.save();
+    tctx.strokeStyle='rgba(60,90,150,.4)';
+    tctx.lineWidth=.7;
+    tctx.setLineDash([5,14]);
+    // draw ellipse: save translate to sun screen pos, scale Y by .35
+    const sunSX=wx(0), sunSY=wy(0);
+    tctx.save();
+    tctx.translate(sunSX, sunSY);
+    tctx.scale(1,.35);
+    tctx.beginPath();
+    tctx.arc(0,0,b.orb*TR.camScale,0,Math.PI*2);
+    tctx.restore();
+    tctx.stroke();
+    tctx.setLineDash([]);
+    tctx.restore();
+  });
+
+  // travel path line (during cruise)
+  if(TR.phase==='cruise'){
+    const fp=getPlanetPos(TR.from,t), tp=getPlanetPos(TR.to,t);
+    const fsx=wx(fp.x), fsy=wy(fp.y*.35+(fp.y*.65)), tsx=wx(tp.x), tsy=wy(tp.y*.35+(tp.y*.65));
+    // dashed arc path
+    tctx.save();
+    tctx.strokeStyle='rgba(100,255,218,.2)';
+    tctx.lineWidth=1;
+    tctx.setLineDash([8,18]);
+    tctx.beginPath();
+    // project with .35 Y scale via actual planet screen positions
+    const fromSX=wx(fp.x), fromSY=wy(fp.y*.35), toSX=wx(tp.x), toSY=wy(tp.y*.35);
+    tctx.moveTo(fromSX, fromSY);
+    tctx.lineTo(toSX, toSY);
+    tctx.stroke();
+    tctx.setLineDash([]);
+    tctx.restore();
+    // animated dot along path
+    const ep=easeInOut3(TR.prog);
+    const dotX=lerp(fromSX,toSX,ep), dotY=lerp(fromSY,toSY,ep);
+    tctx.beginPath();tctx.arc(dotX,dotY,3.5,0,Math.PI*2);
+    tctx.fillStyle='rgba(100,255,218,1)';tctx.fill();
+    tctx.beginPath();tctx.arc(dotX,dotY,7,0,Math.PI*2);
+    tctx.fillStyle='rgba(100,255,218,.25)';tctx.fill();
+    // short comet tail
+    const tailX=dotX-Math.cos(Math.atan2(toSY-fromSY,toSX-fromSX))*20;
+    const tailY=dotY-Math.sin(Math.atan2(toSY-fromSY,toSX-fromSX))*20;
+    const tg=tctx.createLinearGradient(dotX,dotY,tailX,tailY);
+    tg.addColorStop(0,'rgba(100,255,218,.6)');tg.addColorStop(1,'rgba(100,255,218,0)');
+    tctx.beginPath();tctx.moveTo(dotX,dotY);tctx.lineTo(tailX,tailY);
+    tctx.strokeStyle=tg;tctx.lineWidth=2;tctx.stroke();
+  }
+
+  // draw each planet
+  SYSTEM.forEach((b,i)=>{
+    const pos=getPlanetPos(i,t);
+    const sx=wx(pos.x), sy=wy(pos.y*.35);   // .35 Y compression = orbital plane tilt
+    const pr=Math.max(4, b.r*TR.camScale*.55);
+
+    // destination/source glow
+    const isDest=TR.active&&i===TR.to;
+    const isSrc=TR.active&&i===TR.from;
+    if(isDest){
+      const pulse=.5+.5*Math.sin(t*3.5);
+      for(let k=3;k>=1;k--){
+        tctx.beginPath();tctx.arc(sx,sy,pr*(2+k*.8),0,Math.PI*2);
+        tctx.fillStyle=`rgba(100,255,218,${.04*pulse/k})`;tctx.fill();
+      }
+      tctx.beginPath();tctx.arc(sx,sy,pr*1.9,0,Math.PI*2);
+      tctx.fillStyle=`rgba(100,255,218,${.14*pulse})`;tctx.fill();
+    } else if(isSrc){
+      tctx.beginPath();tctx.arc(sx,sy,pr*2.2,0,Math.PI*2);
+      tctx.fillStyle='rgba(100,255,218,.06)';tctx.fill();
+    }
+
+    DRAWERS[b.drawIdx](tctx,sx,sy,pr,t,1);
+
+    // label
+    if(pr>5){
+      tctx.font=`${clamp(pr*.85,8,13)}px 'Space Mono',monospace`;
+      tctx.textAlign='center';
+      tctx.fillStyle=isDest?'rgba(100,255,218,.9)':'rgba(100,255,218,.45)';
+      tctx.fillText(b.label, sx, sy+pr*2.4);
+      if(isDest||isSrc){
+        tctx.fillStyle='rgba(100,255,218,.25)';
+        tctx.fillText(b.name, sx, sy+pr*3.5);
+      }
+    }
+  });
+
+  // distance / speed HUD text (top left corner of tc)
+  if(TR.active){
+    tctx.save();
+    tctx.font="10px 'Space Mono',monospace";
+    tctx.fillStyle='rgba(100,255,218,.35)';
+    tctx.textAlign='left';
+    const dist=Math.round(Math.abs(SYSTEM[TR.to].orb-SYSTEM[TR.from].orb));
+    tctx.fillText(`ORIGIN  :  ${SYSTEM[TR.from].label}`, 28, 36);
+    tctx.fillText(`DEST    :  ${SYSTEM[TR.to].label}`,   28, 54);
+    tctx.fillText(`PHASE   :  ${TR.phase.toUpperCase()}`,28, 72);
+    tctx.fillText(`DIST    :  ${dist} AU`,               28, 90);
+    tctx.restore();
+  }
+}
+
+// warp star streaks drawn on #tc during transitions
+function drawWarpStreaks(t){
+  if(!TR.active) return;
+  // intensity ramps up during pullout/cruise, fades on divein
+  let intensity=0;
+  if(TR.phase==='pullout') intensity=easeOut2(TR.prog)*.7;
+  else if(TR.phase==='cruise') intensity=.7;
+  else if(TR.phase==='divein') intensity=easeOut2(1-TR.prog)*.5;
+  if(intensity<.02) return;
+  const cx=tc.width/2, cy=tc.height/2;
+  tctx.save();
+  stars.forEach(s=>{
+    const dx=s.x-cx,dy=s.y-cy;
+    const dist=Math.sqrt(dx*dx+dy*dy)||1;
+    const stretch=intensity*intensity*clamp(dist/70,1,8)*18;
+    const nx=s.x+dx/dist*stretch*1.8, ny=s.y+dy/dist*stretch*1.8;
+    const ga=intensity*s.a*(dist/(tc.width)*2+.25);
+    if(ga<.02)return;
+    const sg=tctx.createLinearGradient(s.x,s.y,nx,ny);
+    sg.addColorStop(0,'rgba(255,255,255,0)');
+    sg.addColorStop(.25,`rgba(255,255,255,${ga*.55})`);
+    sg.addColorStop(1,`rgba(255,255,255,${ga})`);
+    tctx.beginPath();tctx.moveTo(s.x,s.y);tctx.lineTo(nx,ny);
+    tctx.strokeStyle=sg;tctx.lineWidth=.7+intensity*.6;tctx.stroke();
+  });
+  tctx.restore();
+}
+
+// transition meteors burst pool
+const tMeteors=[];
+let tMetBurst=0;
+function triggerMetBurst(n){
+  for(let i=0;i<n;i++) setTimeout(()=>{
+    const a=Math.random()*Math.PI*2;
+    const spd=14+Math.random()*20;
+    tMeteors.push({
+      x:tc.width*.5+Math.cos(a)*tc.width*.55,
+      y:tc.height*.5+Math.sin(a)*tc.height*.55,
+      vx:Math.cos(a+Math.PI)*spd,
+      vy:Math.sin(a+Math.PI)*spd,
+      len:100+Math.random()*180,w:1+Math.random()*2,life:1,
+      col:'rgba(100,255,218,'
+    });
+  }, i*30);
+}
+
+function drawTransMeteors(){
+  for(let i=tMeteors.length-1;i>=0;i--){
+    const m=tMeteors[i];
+    m.x+=m.vx;m.y+=m.vy;m.life-=.022;
+    if(m.life<=0){tMeteors.splice(i,1);continue;}
+    const tx2=m.x-m.vx*(m.len/18),ty2=m.y-m.vy*(m.len/18);
+    const g=tctx.createLinearGradient(m.x,m.y,tx2,ty2);
+    g.addColorStop(0,m.col+m.life+')');g.addColorStop(.35,m.col+(m.life*.4)+')');g.addColorStop(1,m.col+'0)');
+    tctx.beginPath();tctx.moveTo(m.x,m.y);tctx.lineTo(tx2,ty2);
+    tctx.strokeStyle=g;tctx.lineWidth=m.w;tctx.stroke();
+    tctx.beginPath();tctx.arc(m.x,m.y,m.w*1.3,0,Math.PI*2);
+    tctx.fillStyle=m.col+(m.life*.85)+')';tctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN RENDER LOOP
+// ═══════════════════════════════════════════════════════
+let lastT=0, globalT=0;
+function loop(ts){
+  const t=ts*.001;
+  const dt=Math.min(t-lastT,.05); lastT=t; globalT=t;
+
+  // consume scroll
+  if(!blockInput&&wheelQ!==0){
+    targetScrollY=clamp(targetScrollY+wheelQ,0,maxSY());
+    wheelQ=0; schedSnap();
+  } else { wheelQ=0; }
+
+  // detect section crossing
+  if(!blockInput){
+    const nearSec=clamp(Math.round(targetScrollY/VH()),0,secs.length-1);
+    if(nearSec!==curSec){ targetScrollY=nearSec*VH(); beginTransition(curSec,nearSec); }
+  }
+
+  // scroll
+  if(!blockInput){
+    scrollY+=(targetScrollY-scrollY)*(1-Math.pow(.005,dt));
+    inner.style.transform=`translateY(${-scrollY}px)`;
+    checkReveals(scrollY);
+  }
+
+  // advance transition state machine
+  if(TR.active){
+    const prev=TR.phase;
+    advanceTransition(dt,t);
+    // fire meteor bursts at phase entrances
+    if(prev==='idle'||prev!==TR.phase){
+      if(TR.phase==='pullout') triggerMetBurst(12);
+      if(TR.phase==='cruise')  triggerMetBurst(22);
+      if(TR.phase==='divein')  triggerMetBurst(16);
+    }
+  }
+
+  // ── BACKGROUND CANVAS (gc) ──
+  gctx.clearRect(0,0,gc.width,gc.height);
+  if(!TR.active){
+    // normal star field
+    stars.forEach(s=>{
+      const a=s.a*(.45+.55*Math.sin(t*s.sp+s.ph));
+      gctx.beginPath();gctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      gctx.fillStyle=`rgba(255,255,255,${a})`;gctx.fill();
+    });
+    drawMeteors();
+  } else {
+    // during transit: dim background (tc takes over)
+    stars.forEach(s=>{
+      gctx.beginPath();gctx.arc(s.x,s.y,s.r*.7,0,Math.PI*2);
+      gctx.fillStyle=`rgba(255,255,255,${s.a*.08})`;gctx.fill();
+    });
+  }
+
+  // ── PLANET CLOSE-UP (pc) ──
+  pctx.clearRect(0,0,pc.width,pc.height);
+  if(!TR.active){
+    const pcx=pc.width*.5, pcy=pc.height*.5;
+    const pr=Math.min(pc.width,pc.height)*.285;
+    DRAWERS[curSec](pctx,pcx,pcy,pr,t,1);
+  }
+
+  // ── TRANSITION CANVAS (tc) ──
+  if(TR.active){
+    drawSystemScene(t);
+    drawWarpStreaks(t);
+    drawTransMeteors();
+
+    // vignette on tc edges
+    const vg=tctx.createRadialGradient(tc.width*.5,tc.height*.5,tc.height*.12,tc.width*.5,tc.height*.5,tc.height*.76);
+    vg.addColorStop(0,'rgba(2,4,14,0)');vg.addColorStop(.6,'rgba(2,4,14,0)');vg.addColorStop(1,'rgba(2,4,14,.65)');
+    tctx.fillStyle=vg;tctx.fillRect(0,0,tc.width,tc.height);
+  }
+
+  requestAnimationFrame(loop);
+}
+
+
+// ═══════════════════════════════════════════════════════
+// INTERACTIVITY
+// ═══════════════════════════════════════════════════════
+
+// ── 1. Typewriter effect for intro role line ──
+(function(){
+  const roles = ['數學建模研究者','AI 工程師','隨機過程研究者','科學計算專家','Python 開發者'];
+  let ri=0, ci=0, deleting=false;
+  const el=document.getElementById('role-text');
+  if(!el) return;
+  function tick(){
+    const word=roles[ri];
+    if(!deleting){
+      ci++;
+      el.textContent=word.slice(0,ci);
+      if(ci===word.length){ deleting=true; setTimeout(tick,1800); return; }
+      setTimeout(tick, 90+Math.random()*40);
+    } else {
+      ci--;
+      el.textContent=word.slice(0,ci);
+      if(ci===0){ deleting=false; ri=(ri+1)%roles.length; setTimeout(tick,420); return; }
+      setTimeout(tick, 48);
+    }
+  }
+  setTimeout(tick,900);
+})();
+
+// ── 2. Skill tag toggle highlight ──
+document.querySelectorAll('.sk').forEach(sk=>{
+  sk.addEventListener('click',()=>{
+    sk.classList.toggle('active');
+    // ripple effect
+    const r=document.createElement('span');
+    r.style.cssText='position:absolute;border-radius:50%;background:rgba(100,255,218,.25);width:6px;height:6px;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);transition:transform .4s ease,opacity .4s ease;pointer-events:none;opacity:.7';
+    sk.style.position='relative';sk.style.overflow='hidden';
+    sk.appendChild(r);
+    requestAnimationFrame(()=>{ r.style.transform='translate(-50%,-50%) scale(8)'; r.style.opacity='0'; });
+    setTimeout(()=>r.remove(), 450);
+  });
+});
+
+// ── 3. Work item expand/collapse ──
+document.querySelectorAll('.wk').forEach(wk=>{
+  wk.addEventListener('click',()=>{
+    const wasOpen=wk.classList.contains('open');
+    document.querySelectorAll('.wk.open').forEach(o=>o.classList.remove('open'));
+    if(!wasOpen) wk.classList.add('open');
+  });
+});
+
+// ── 4. Contact copy on click ──
+(function(){
+  const toast=document.getElementById('copy-toast');
+  let toastTimer;
+  function showToast(msg){
+    if(toast){ toast.textContent=msg||'COPIED TO CLIPBOARD'; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'),1800); }
+  }
+  document.querySelectorAll('.ci').forEach(ci=>{
+    ci.addEventListener('click',e=>{
+      const val=ci.querySelector('.clv')?.textContent;
+      const href=ci.getAttribute('href')||'';
+      if(href.startsWith('mailto:')){ navigator.clipboard?.writeText(href.replace('mailto:','')).then(()=>showToast('EMAIL COPIED')); e.preventDefault(); }
+      else if(href.startsWith('tel:')){ navigator.clipboard?.writeText(href.replace('tel:','')).then(()=>showToast('PHONE COPIED')); e.preventDefault(); }
+      else if(val){ navigator.clipboard?.writeText(val).then(()=>showToast('COPIED')); e.preventDefault(); }
+    });
+  });
+})();
+
+// ── 5. Subtle mouse parallax on content panel ──
+(function(){
+  let px=0,py=0,tpx=0,tpy=0;
+  document.addEventListener('mousemove',e=>{ tpx=(e.clientX/innerWidth-.5)*1.4; tpy=(e.clientY/innerHeight-.5)*1.0; });
+  (function parallaxLoop(){
+    px+=(tpx-px)*.06; py+=(tpy-py)*.06;
+    const inner2=document.getElementById('scroll-inner');
+    if(inner2 && !TR.active){
+      // subtle tilt without breaking translate Y
+      const baseY=parseFloat(inner2.style.transform?.match(/translateY\((.+?)px\)/)?.[1]||0);
+      inner2.style.transform=`translateY(${-scrollY}px) translateX(${px*3}px)`;
+    }
+    requestAnimationFrame(parallaxLoop);
+  })();
+})();
+
+
+curSec=0;
+targetScrollY=0; scrollY=0;
+inner.style.transform='translateY(0)';
+secs[0].querySelectorAll('.rv').forEach(el=>el.classList.add('in'));
+ptag.textContent=SYSTEM[0].name;
+shint.style.opacity='.38';
+dots[0].classList.add('on');
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
