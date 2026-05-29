@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>陳健銘 · Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="cur"></div><div id="cur2"></div>
+
+<!-- ══ NEURAL GRID LANDING ══ -->
+<div id="landing">
+  <canvas id="ng-canvas"></canvas>
+  <div class="cor cor-tl"></div>
+  <div class="cor cor-tr"></div>
+  <div class="cor cor-bl"></div>
+  <div class="cor cor-br"></div>
+  <div id="landing-ui">
+    <div id="lng-eyebrow">Portfolio · 2026 · NYCU</div>
+    <div id="lng-name">陳健銘</div>
+    <div id="lng-en">CHIEN-MING CHEN</div>
+    <button id="lng-btn" onclick="startEntry()">
+      <span class="lng-pulse"></span>
+      <span class="lng-pulse"></span>
+      ENTER UNIVERSE
+    </button>
+    <div id="lng-sub">NEURAL NETWORK ACTIVE · CLICK TO LAUNCH</div>
+  </div>
+  <div id="lng-status">
+    <div id="lng-beacon"></div>
+    <span id="lng-status-txt">SYSTEM ONLINE · NODE COUNT: <span id="lng-node-ct">0</span> · AWAITING INPUT</span>
+  </div>
+</div>
+
+<!-- ══ ROCKET CANVAS (entry animation) ══ -->
+<canvas id="rkt-canvas"></canvas>
+
+<!-- z1: star/meteor bg -->
+<canvas id="gc"></canvas>
+<!-- z3: planet closeup left panel -->
+<canvas id="pc"></canvas>
+<!-- z4: content panel -->
+<div id="panel">
+  <div id="scroll-inner">
+
+    <!-- 01 INTRO -->
+    <div class="sec" data-sec="0">
+      <span class="snum">01 / 06</span>
+      <div class="stag rv s1">Hello, World</div>
+      <div class="rv s1"><div class="intro-badge"><div class="intro-badge-dot"></div>NYCU · 數學建模與科學計算研究所</div></div>
+      <h1 class="name-big rv s2">陳健銘</h1>
+      <div class="rv s2"><p class="name-en">CHIEN-MING CHEN</p></div>
+      <div class="rv s3">
+        <div id="role-line"><span id="role-text"></span><span class="twcursor"></span></div>
+        <p>數學建模研究者 · AI 工程師，深耕<span class="hi">科學計算</span>與<span class="hi">隨機過程</span>理論，善於將物理、生物與金融問題轉化為可計算的數學架構。</p>
+        <div class="dv"></div>
+        <p>現居 <span class="hi">台灣・新竹</span>，就讀國立陽明交通大學數學建模與科學計算研究所，目標融合數理與 AI 技術解決高影響力的複雜問題。</p>
+      </div>
+    </div>
+
+    <!-- 02 EDUCATION -->
+    <div class="sec" data-sec="1">
+      <span class="snum">02 / 06</span>
+      <div class="stag rv s1">Academic Journey</div>
+      <h2 class="stitle rv s2">學歷</h2>
+      <div class="rv s3">
+        <div class="ei"><div class="eyr">2021 — 2025</div><div class="esc">國立臺東大學</div><div class="ede">應用數學系 · 學士</div></div>
+        <div class="ei"><div class="eyr">2025 — 2027（就讀中）</div><div class="esc">國立陽明交通大學</div><div class="ede">數學建模與科學計算研究所 · 碩士</div></div>
+      </div>
+    </div>
+
+    <!-- 03 SKILLS -->
+    <div class="sec" data-sec="2">
+      <span class="snum">03 / 06</span>
+      <div class="stag rv s1">Skills & Expertise</div>
+      <h2 class="stitle rv s2">專長</h2>
+      <div class="rv s3">
+        <div class="scat">程式語言 & 工具</div>
+        <div class="sgr"><div class="sk">Python</div><div class="sk">NumPy</div><div class="sk">Matplotlib</div><div class="sk">Linux</div><div class="sk">LabelImg</div><div class="sk">YOLO</div></div>
+        <div class="scat">數值分析 & 科學計算</div>
+        <div class="sgr"><div class="sk">Numerical PDEs</div><div class="sk">Spectral Methods</div><div class="sk">FFT Solvers</div><div class="sk">FDM</div><div class="sk">RK4</div><div class="sk">MMS</div></div>
+        <div class="scat">數學建模 & 分析</div>
+        <div class="sgr"><div class="sk">Stochastic Processes</div><div class="sk">Linear Algebra</div><div class="sk">Algorithmic Analysis</div><div class="sk">數據分析</div></div>
+      </div>
+    </div>
+
+    <!-- 04 PROJECTS -->
+    <div class="sec sec-projects" data-sec="3">
+      <span class="snum">04 / 06</span>
+      <div class="stag rv s1">Research & Projects</div>
+      <h2 class="stitle rv s2">專案實作</h2>
+      <div class="rv s3">
+        <div class="proj-grid">
+          <div class="proj-card">
+            <div class="proj-cat">科學計算</div>
+            <div class="proj-title">非線性反應擴散方程求解器</div>
+            <div class="proj-desc">自主編寫 Python 腳本，結合 FFT 與 RK4 實現高精度時空離散化模擬。導入 MMS 與網格收斂性分析，精準排除數值偽解，確保物理真實性。</div>
+            <div class="proj-tags"><span class="proj-tag">Python</span><span class="proj-tag">FFT</span><span class="proj-tag">RK4</span><span class="proj-tag">Spectral Methods</span><span class="proj-tag">MMS</span></div>
+          </div>
+          <div class="proj-card">
+            <div class="proj-cat">機率統計</div>
+            <div class="proj-title">多維隨機漫步與預測模型</div>
+            <div class="proj-desc">推導隨機過程之 Stopping Time 分布函數、期望值與變異數。成功應用於金融障礙選擇權定價，具備強大的隨機異常與統計分析即戰力。</div>
+            <div class="proj-tags"><span class="proj-tag">Stochastic Processes</span><span class="proj-tag">NumPy</span><span class="proj-tag">Stopping Time</span><span class="proj-tag">Options Pricing</span></div>
+          </div>
+          <div class="proj-card">
+            <div class="proj-cat">電腦視覺 · AI</div>
+            <div class="proj-title">CV 訓練資料集自動化建構</div>
+            <div class="proj-desc">撰寫自動化影像前處理腳本進行影格抽樣、圖像清洗與品質控管，以 LabelImg 建構符合 YOLO 格式的高品質標注資料集。</div>
+            <div class="proj-tags"><span class="proj-tag">YOLO</span><span class="proj-tag">LabelImg</span><span class="proj-tag">Python</span><span class="proj-tag">Computer Vision</span></div>
+          </div>
+          <div class="proj-card">
+            <div class="proj-cat">數值分析</div>
+            <div class="proj-title">有限差分法 PDE 求解比較</div>
+            <div class="proj-desc">系統性比較 FDM、Spectral Method 等數值方法在不同邊界條件下的精度與效率，建立誤差分析框架與收斂性報告。</div>
+            <div class="proj-tags"><span class="proj-tag">FDM</span><span class="proj-tag">Spectral Methods</span><span class="proj-tag">Numerical PDEs</span><span class="proj-tag">Matplotlib</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 EXPERIENCE -->
+    <div class="sec" style="justify-content:flex-start;padding-top:3.5rem;padding-bottom:4rem;" data-sec="4">
+      <span class="snum">05 / 06</span>
+      <div class="stag rv s1">Work Experience</div>
+      <h2 class="stitle rv s2">工作經歷</h2>
+      <div class="rv s3">
+        <div class="tl">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2025/09 — 2026/06</div>
+            <div class="tl-role">AI Intern</div>
+            <div class="tl-org">美商普維股份有限公司（LatticeWork）· 新竹竹北</div>
+            <div class="tl-body">負責 CV 模型訓練之自動化影像前處理，撰寫 Python 腳本進行影格抽樣與圖像清洗；以 LabelImg 進行 Bounding Box 標註與 QA，建構符合 YOLO 格式的高品質訓練資料集。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2024/09 — 2025/02</div>
+            <div class="tl-role">數學老師（線上家教）</div>
+            <div class="tl-org">高教深耕計畫 · 教育部 · 台北大安區</div>
+            <div class="tl-body">線上一對一教授國中數學，將複雜數理概念轉化為易懂的想法，培養學生邏輯思維與解題能力。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2023/09 — 2024/06</div>
+            <div class="tl-role">微積分助教</div>
+            <div class="tl-org">國立臺東大學 · 台東</div>
+            <div class="tl-body">擔任學士班微積分助教，負責習題講解與課後輔導，協助學生掌握微積分核心概念。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2022/07 — 2022/09</div>
+            <div class="tl-role">櫃檯接待人員</div>
+            <div class="tl-org">第一銀行台東分行 · 台東</div>
+            <div class="tl-body">負責銀行櫃檯內勤業務與客戶接待引導，保持高專注度，跨部門協作快速應變，優化客戶服務體驗。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 CONTACT -->
+    <div class="sec sec-contact" data-sec="5">
+      <span class="snum">06 / 06</span>
+      <div class="stag rv s1">Get In Touch</div>
+      <h2 class="stitle rv s2">Contact Me</h2>
+      <div class="rv s3">
+        <p>距離再遠，連結始終存在。歡迎透過以下方式聯繫。</p>
+        <div class="cl">
+          <a class="ci" href="mailto:jcm0621011@gmail.com"><div class="cic">✉</div><div><div class="clb">Email</div><div class="clv">jcm0621011@gmail.com</div></div></a>
+          <a class="ci" href="tel:0968890783"><div class="cic">☎</div><div><div class="clb">Phone</div><div class="clv">0968-890-783</div></div></a>
+          <a class="ci" href="#"><div class="cic" style="font-size:11px;font-weight:600">📍</div><div><div class="clb">Location</div><div class="clv">新竹縣市（希望工作地點）</div></div></a>
+          <a class="ci" href="#"><div class="cic" style="font-size:10px;font-weight:700">役</div><div><div class="clb">役別 / 求職意願</div><div class="clv">未役 · 尋找研發替代役 / 實習</div></div></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- z50: full-screen transition canvas -->
+<canvas id="tc"></canvas>
+<!-- HUD shown during transit -->
+<div id="trans-hud">
+  <div id="trans-dest">— NAVIGATING —</div>
+  <div id="trans-prog-bar"><div id="trans-prog-fill"></div></div>
+</div>
+
+<div id="copy-toast">COPIED TO CLIPBOARD</div>
+<div id="ptag">太陽 · Sun</div>
+<div id="dots">
+  <div class="dot on" data-i="0"></div>
+  <div class="dot" data-i="1"></div>
+  <div class="dot" data-i="2"></div>
+  <div class="dot" data-i="3"></div>
+  <div class="dot" data-i="4"></div>
+  <div class="dot" data-i="5"></div>
+</div>
+<div id="shint"><div class="sa"></div><span>SCROLL</span></div>
+
+<script src="main.js"></script>
+</body>
+</html>
