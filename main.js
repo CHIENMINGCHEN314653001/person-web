@@ -1111,7 +1111,7 @@ function loop(ts){
 
 // ── 1. Typewriter effect for intro role line ──
 (function(){
-  const roles = ['數學建模研究者','AI 工程師','隨機過程研究者','科學計算專家','Python 開發者'];
+  const roles = ['數學建模研究者','AI 學習者','隨機過程研究者','科學計算','Python 學習者'];
   let ri=0, ci=0, deleting=false;
   const el=document.getElementById('role-text');
   if(!el) return;
